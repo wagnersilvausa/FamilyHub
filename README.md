@@ -7,6 +7,7 @@ FamilyHub é uma aplicação web mobile-first desenvolvida com Next.js para gere
 ## 🎯 Funcionalidades
 
 ### 💰 Módulo Financeiro
+
 - Registrar gastos com valor, cartão, motivo e observação
 - Controle automático de parcelamentos (cria lançamentos futuros)
 - Status do gasto: Pendente, Quitado, Urgente
@@ -14,21 +15,25 @@ FamilyHub é uma aplicação web mobile-first desenvolvida com Next.js para gere
 - Relatório mensal com envio via Telegram para Wagner
 
 ### 📅 Módulo de Agenda
+
 - Criar compromissos (consultas, escola, atividades)
 - Calendário visual
 - Lembretes automáticos via Telegram (Vercel Cron Job)
 
 ### 🏥 Módulo de Saúde
+
 - Histórico de consultas (médico, data, observações)
 - Medicamentos contínuos (nome, dose, frequência)
 - Upload de receitas e laudos
 
 ### 📷 Módulo de Fotos/Documentos
+
 - Upload de fotos com categorias
 - Captura de câmera ou galeria
 - Busca global por nome, categoria ou descrição
 
 ### 📊 Dashboard
+
 - Total gasto no mês
 - Próximos compromissos
 - Últimos lançamentos
@@ -37,6 +42,7 @@ FamilyHub é uma aplicação web mobile-first desenvolvida com Next.js para gere
 ## 🚀 Setup & Instalação
 
 ### 1. Pré-requisitos
+
 - Node.js 18+ instalado
 - Conta no [Supabase](https://supabase.com)
 - Bot do Telegram criado (usar @BotFather)
@@ -71,6 +77,7 @@ npm install
 ### 5. Variáveis de Ambiente
 
 1. Copiar `.env.example` para `.env.local`:
+
    ```bash
    cp .env.example .env.local
    ```
@@ -97,6 +104,7 @@ Acessar em [http://localhost:3000](http://localhost:3000)
 ## 📱 Rotas da Aplicação
 
 ### Interface da Mãe (Wagner)
+
 - `/registrar` - Painel principal
 - `/registrar/gasto` - Registrar gasto
 - `/registrar/gastos` - Ver gastos
@@ -109,6 +117,7 @@ Acessar em [http://localhost:3000](http://localhost:3000)
 - `/registrar/relatorio` - Relatório mensal
 
 ### Interface do Pai (Wagner)
+
 - `/painel` - Dashboard
 - `/painel/timeline` - Timeline do Davi
 
@@ -117,6 +126,7 @@ Acessar em [http://localhost:3000](http://localhost:3000)
 ### Configurar Lembretes Automáticos
 
 1. Fazer deploy no Vercel:
+
    ```bash
    npm install -g vercel
    vercel deploy
@@ -146,24 +156,31 @@ Acessar em [http://localhost:3000](http://localhost:3000)
 ### Tabelas Supabase
 
 **gastos**
+
 - id, valor, cartao, motivo, observacao, data, horario, parcela_atual, parcelas_total, valor_parcela, status, created_at
 
 **parcelas_futuras**
+
 - id, gasto_id, valor, mes_referencia, status, created_at
 
 **agenda**
+
 - id, titulo, tipo, data, hora, observacao, created_at
 
 **saude_consultas**
+
 - id, medico, data, observacoes, foto_url, created_at
 
 **medicamentos**
+
 - id, nome, dose, frequencia, created_at
 
 **documentos**
+
 - id, titulo, descricao, categoria, subcategoria, arquivo_url, tipo_arquivo, data, created_at
 
 **audios**
+
 - id, descricao, audio_url, modulo, created_at
 
 ## 🔐 Segurança
@@ -200,11 +217,3 @@ vercel deploy
 ## 🤝 Contribuindo
 
 Ideias, sugestões e melhorias são bem-vindas!
-
-## 📄 Licença
-
-MIT
-
----
-
-**Desenvolvido com ❤️ para a família**
