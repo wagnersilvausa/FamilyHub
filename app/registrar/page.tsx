@@ -430,38 +430,6 @@ export default function RegistrarPage() {
             </div>
           </div>
 
-          {/* ── Resumo do Davi ── */}
-          <div className="fade-up-5">
-            <div className="rounded-3xl p-5" style={{ background: 'linear-gradient(135deg,#fefce8,#fef9c3,#fef08a)' }}>
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0" style={{ background: 'rgba(255,255,255,0.7)' }}>
-                  👦
-                </div>
-                <div>
-                  <h3 className="text-lg font-black text-amber-900">Davi</h3>
-                  <p className="text-amber-700 text-sm font-semibold">
-                    {anos} anos e {meses} {meses === 1 ? 'mês' : 'meses'} 🎂
-                  </p>
-                  <p className="text-xs text-amber-500 mt-0.5">
-                    Nasceu em {DAVI_NASCIMENTO.toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-amber-800 mb-1.5">✏️ Nota rápida sobre o Davi</label>
-                <textarea
-                  value={notaRapida}
-                  onChange={e => setNotaRapida(e.target.value)}
-                  placeholder="Ex: Escola, atividades, humor do dia..."
-                  rows={2}
-                  className="w-full px-3 py-2.5 rounded-xl text-sm text-amber-900 placeholder-amber-400 resize-none focus:outline-none focus:ring-2"
-                  style={{ background: 'rgba(255,255,255,0.6)', border: '1.5px solid rgba(251,191,36,0.4)' }}
-                />
-              </div>
-            </div>
-          </div>
-
           {/* ══ AÇÕES RÁPIDAS ═════════════════════════════════════════════════ */}
           <div className="fade-up-6">
             <h2 className="text-lg font-black text-slate-800 mb-3 px-1">⚡ Ações Rápidas</h2>
