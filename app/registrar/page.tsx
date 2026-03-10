@@ -261,8 +261,14 @@ export default function RegistrarPage() {
           {/* saudação */}
           <div className="relative px-5 pb-2">
             <p className="text-white/70 text-sm font-medium mb-0.5">Bem-vinda de volta 🌸</p>
-            <h1 className="text-4xl font-black text-white mb-1" style={{ letterSpacing: '-0.02em' }}>Olá, Luzia! 👋</h1>
-            <p className="text-white/80 text-base">Seu painel de controle familiar</p>
+            <h1 className="text-4xl font-black text-white mb-3" style={{ letterSpacing: '-0.02em' }}>Olá, Luzia! 👋</h1>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">👦</span>
+              <div>
+                <p className="text-white font-black text-lg">Davi</p>
+                <p className="text-white/80 text-sm">{anos} anos e {meses} {meses === 1 ? 'mês' : 'meses'} · Nascido em {DAVI_NASCIMENTO.toLocaleDateString('pt-BR')}</p>
+              </div>
+            </div>
           </div>
 
           {/* clima inline no header */}
