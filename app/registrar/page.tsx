@@ -442,42 +442,6 @@ export default function RegistrarPage() {
                 </div>
               </div>
 
-              {/* Contagem regressiva para o aniversário */}
-              <div className="rounded-2xl p-3 mb-4 text-center" style={{ background: 'rgba(255,255,255,0.6)' }}>
-                {ehHojeAniversario ? (
-                  <div>
-                    <p className="text-2xl mb-0.5">🎉🎂🎉</p>
-                    <p className="font-black text-amber-800 text-base">Hoje é aniversário do Davi!</p>
-                    <p className="text-amber-600 text-xs font-semibold">Parabéns pelos {anos} anos! 🥳</p>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Próximo aniversário — {proximoAniversarioData}</p>
-                    <div className="flex items-end justify-center gap-1">
-                      <span className="text-4xl font-black text-amber-800" style={{ letterSpacing: '-0.04em' }}>
-                        {diasParaAniversario}
-                      </span>
-                      <span className="text-amber-600 font-bold text-sm mb-1.5">
-                        {diasParaAniversario === 1 ? 'dia' : 'dias'}
-                      </span>
-                    </div>
-                    <div className="mt-1.5 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(251,191,36,0.25)' }}>
-                      <div
-                        className="h-full rounded-full"
-                        style={{
-                          background: 'linear-gradient(90deg,#f59e0b,#fbbf24)',
-                          width: `${Math.max(2, 100 - Math.min(100, (diasParaAniversario / 365) * 100))}%`,
-                          transition: 'width 0.8s ease'
-                        }}
-                      />
-                    </div>
-                    <p className="text-amber-500 text-xs mt-1">
-                      {diasParaAniversario <= 7 ? '🎈 Chegando aí!' : diasParaAniversario <= 30 ? '🎊 Logo logo!' : '📅 Guardando energia!'}
-                    </p>
-                  </div>
-                )}
-              </div>
-
               <div>
                 <label className="block text-xs font-bold text-amber-800 mb-1.5">✏️ Nota rápida sobre o Davi</label>
                 <textarea
