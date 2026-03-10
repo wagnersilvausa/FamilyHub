@@ -16,10 +16,11 @@ CREATE TABLE IF NOT EXISTS gastos (
   observacao TEXT,
   data DATE NOT NULL,
   horario TIME NOT NULL,
+  data_vencimento DATE,
   parcela_atual INTEGER DEFAULT 1,
   parcelas_total INTEGER DEFAULT 1,
   valor_parcela DECIMAL(10, 2),
-  status TEXT DEFAULT 'pendente' CHECK (status IN ('pendente', 'quitado', 'urgente')),
+  status TEXT DEFAULT 'agendado' CHECK (status IN ('agendado', 'pendente', 'quitado', 'urgente')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -171,6 +172,29 @@ CREATE TRIGGER trigger_update_gastos_timestamp
 BEFORE UPDATE ON gastos
 FOR EACH ROW
 EXECUTE FUNCTION update_gastos_timestamp();
+
+-- Auto-update status based on due date (3 days rule)
+CREATE OR REPLACE FUNCTION update_gasto_status_by_date()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Se tem data_vencimento e ainda não foi quitado
+  IF NEW.data_vencimento IS NOT NULL AND NEW.status != 'quitado' THEN
+    -- Se falta 3 dias ou menos para vencer, marca como pendente
+    IF (NEW.data_vencimento - CURRENT_DATE) <= 3 AND (NEW.data_vencimento - CURRENT_DATE) >= 0 THEN
+      NEW.status = 'pendente';
+    -- Se ainda falta mais de 3 dias, marca como agendado
+    ELSIF (NEW.data_vencimento - CURRENT_DATE) > 3 THEN
+      NEW.status = 'agendado';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_gasto_status_by_date
+BEFORE INSERT OR UPDATE ON gastos
+FOR EACH ROW
+EXECUTE FUNCTION update_gasto_status_by_date();
 
 -- Update timestamp on parcelas_futuras
 CREATE OR REPLACE FUNCTION update_parcelas_timestamp()

@@ -5,6 +5,8 @@ import Header from '@/components/Header'
 import Button from '@/components/Button'
 import Card from '@/components/Card'
 import Toast from '@/components/Toast'
+import { supabase } from '@/lib/supabase'
+import { getCurrentDate } from '@/lib/utils'
 
 const CATEGORIAS = {
   'Comprovantes de Gasto': ['Nota Fiscal', 'Comprovante de Pagamento', 'Recibo'],
@@ -46,8 +48,42 @@ export default function FotosPage() {
     setLoading(true)
 
     try {
-      // TODO: Upload para Supabase Storage
-      // Por enquanto, vamos simular o salvamento
+      // Converter data URL para blob
+      const response = await fetch(fotoPreview)
+      const blob = await response.blob()
+
+      // Gerar nome único para o arquivo
+      const timestamp = Date.now()
+      const nomeArquivo = `fotos/${timestamp}-${titulo.replace(/\s+/g, '-')}.jpg`
+
+      // Upload para Supabase Storage
+      const { error: uploadError, data } = await supabase.storage
+        .from('familyhub')
+        .upload(nomeArquivo, blob, {
+          contentType: 'image/jpeg',
+          upsert: false,
+        })
+
+      if (uploadError) throw uploadError
+
+      // Obter URL pública da foto
+      const { data: publicUrlData } = supabase.storage
+        .from('familyhub')
+        .getPublicUrl(nomeArquivo)
+
+      const fotoUrl = publicUrlData.publicUrl
+
+      // Salvar dados no banco
+      const { error: dbError } = await supabase
+        .from('fotos')
+        .insert([{
+          titulo,
+          descricao,
+          foto_url: fotoUrl,
+          data: getCurrentDate(),
+        }])
+
+      if (dbError) throw dbError
 
       setToast({ message: '✅ Foto salva com sucesso!', type: 'success' })
       setTitulo('')

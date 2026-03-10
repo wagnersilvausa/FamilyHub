@@ -3,48 +3,45 @@
 import { useEffect, useState } from 'react'
 import Header from '@/components/Header'
 import Card from '@/components/Card'
-import { supabase, Documento } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { formatDate } from '@/lib/utils'
 
-const CATEGORIAS = [
-  'Comprovantes de Gasto',
-  'Despesas do Dia a Dia',
-  'Saúde',
-  'Documentos Gerais',
-]
+interface Foto {
+  id: string
+  titulo: string
+  descricao?: string
+  foto_url: string
+  data?: string
+  created_at: string
+}
 
 export default function FotosGaleriaPage() {
-  const [fotos, setFotos] = useState<Documento[]>([])
-  const [filtroCategoria, setFiltroCategoria] = useState('')
+  const [fotos, setFotos] = useState<Foto[]>([])
   const [busca, setBusca] = useState('')
   const [loading, setLoading] = useState(true)
-  const [fotoSelecionada, setFotoSelecionada] = useState<Documento | null>(null)
+  const [fotoSelecionada, setFotoSelecionada] = useState<Foto | null>(null)
 
   useEffect(() => {
     carregarFotos()
-  }, [filtroCategoria, busca])
+  }, [busca])
 
   const carregarFotos = async () => {
     try {
       setLoading(true)
-      let query = supabase.from('documentos').select('*')
-
-      if (filtroCategoria) {
-        query = query.eq('categoria', filtroCategoria)
-      }
-
-      const { data, error } = await query.order('data', { ascending: false })
+      const { data, error } = await supabase
+        .from('fotos')
+        .select('*')
+        .order('created_at', { ascending: false })
 
       if (error) throw error
 
-      let result = data || []
+      let result = data as Foto[] || []
 
       if (busca) {
         result = result.filter(
           (foto) =>
             foto.titulo.toLowerCase().includes(busca.toLowerCase()) ||
-            foto.descricao.toLowerCase().includes(busca.toLowerCase()) ||
-            foto.categoria.toLowerCase().includes(busca.toLowerCase())
+            (foto.descricao && foto.descricao.toLowerCase().includes(busca.toLowerCase()))
         )
       }
 
@@ -73,7 +70,7 @@ export default function FotosGaleriaPage() {
 
             <div className="max-w-lg w-full bg-white rounded-2xl overflow-hidden shadow-2xl">
               <img
-                src={fotoSelecionada.arquivo_url}
+                src={fotoSelecionada.foto_url}
                 alt={fotoSelecionada.titulo}
                 className="w-full h-auto"
               />
@@ -82,8 +79,7 @@ export default function FotosGaleriaPage() {
                 <p className="font-bold text-primary mb-2">
                   {fotoSelecionada.titulo}
                 </p>
-                <p className="text-sm text-secondary mb-2">{fotoSelecionada.categoria}</p>
-                <p className="text-xs text-muted mb-4">{formatDate(fotoSelecionada.data)}</p>
+                <p className="text-xs text-muted mb-4">{formatDate(fotoSelecionada.data || fotoSelecionada.created_at)}</p>
 
                 {fotoSelecionada.descricao && (
                   <p className="text-sm text-secondary bg-gray-50/60 p-3 rounded-lg border border-border-light">
@@ -106,23 +102,6 @@ export default function FotosGaleriaPage() {
           />
         </div>
 
-        {/* Filtros */}
-        <div>
-          <label className="block text-sm font-semibold text-primary mb-2.5">Filtrar por Categoria</label>
-          <select
-            value={filtroCategoria}
-            onChange={(e) => setFiltroCategoria(e.target.value)}
-            className="w-full px-4 py-3 border border-border-light rounded-2xl focus:ring-2 focus:ring-wagner focus:outline-none text-primary"
-          >
-            <option value="">Todas as Categorias</option>
-            {CATEGORIAS.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* Grid de Fotos */}
         {loading ? (
           <p className="text-center text-secondary py-8">Carregando...</p>
@@ -137,13 +116,12 @@ export default function FotosGaleriaPage() {
                 className="group relative overflow-hidden rounded-xl hover:shadow-lg transition-shadow border border-border-light"
               >
                 <img
-                  src={foto.arquivo_url}
+                  src={foto.foto_url}
                   alt={foto.titulo}
                   className="w-full h-40 object-cover group-hover:scale-105 transition-transform"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent/20 flex flex-col justify-end p-3">
                   <p className="text-white font-semibold text-sm line-clamp-2">{foto.titulo}</p>
-                  <p className="text-white/75 text-xs mt-1">{foto.categoria}</p>
                 </div>
               </button>
             ))}

@@ -21,10 +21,11 @@ export interface Gasto {
   observacao: string
   data: string
   horario: string
+  data_vencimento?: string | null
   parcela_atual: number
   parcelas_total: number
   valor_parcela: number
-  status: 'pendente' | 'quitado' | 'urgente'
+  status: 'agendado' | 'pendente' | 'quitado' | 'urgente'
   created_at: string
 }
 

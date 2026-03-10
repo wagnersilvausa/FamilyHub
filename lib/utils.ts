@@ -84,3 +84,19 @@ export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
 export function sum(array: number[]): number {
   return array.reduce((acc, val) => acc + val, 0)
 }
+
+export function calculateGastoStatus(dataVencimento: string | null, currentStatus: string): string {
+  if (!dataVencimento || currentStatus === 'quitado') return currentStatus
+
+  const days = daysUntil(dataVencimento)
+
+  if (days <= 3 && days >= 0) {
+    return 'pendente'
+  } else if (days > 3) {
+    return 'agendado'
+  } else if (days < 0) {
+    return 'urgente' // Vencido
+  }
+
+  return currentStatus
+}

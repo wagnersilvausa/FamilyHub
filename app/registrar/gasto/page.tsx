@@ -59,6 +59,9 @@ export default function RegistroGastoPage() {
   const [dataGasto, setDataGasto] = useState(getCurrentDate())
   const [status, setStatus] = useState<'pendente' | 'quitado' | 'urgente'>('quitado')
 
+  // Data de vencimento
+  const [dataVencimento, setDataVencimento] = useState('')
+
   // Parcelamento
   const [showParcelamento, setShowParcelamento] = useState(false)
   const [isParcelado, setIsParcelado] = useState(false)
@@ -145,6 +148,7 @@ export default function RegistroGastoPage() {
     setMotivo('')
     setObservacao('')
     setDataGasto(getCurrentDate())
+    setDataVencimento('')
     setStatus('quitado')
     setIsParcelado(false)
     setShowParcelamento(false)
@@ -166,6 +170,14 @@ export default function RegistroGastoPage() {
       const numParcelas = isParcelado ? totalParcelas : 1
       const vParcela = isParcelado ? valorParcela : valorNumerico
 
+      console.log('📤 Enviando gasto:', {
+        valor: valorNumerico,
+        motivo,
+        cartao,
+        data: dataGasto,
+        dataVencimento,
+      })
+
       const { data: gastoData, error: gastoError } = await supabase
         .from('gastos')
         .insert([{
@@ -174,15 +186,21 @@ export default function RegistroGastoPage() {
           motivo,
           observacao,
           data: dataGasto,
+          data_vencimento: dataVencimento || null,
           horario: getCurrentTime(),
           parcela_atual: isParcelado ? parcelaAtual : 1,
           parcelas_total: numParcelas,
           valor_parcela: vParcela,
-          status,
+          status: dataVencimento ? undefined : status, // Deixa o trigger calcular se tiver data_vencimento
         }])
         .select()
 
-      if (gastoError) throw gastoError
+      if (gastoError) {
+        console.error('❌ Erro ao inserir gasto:', gastoError)
+        throw gastoError
+      }
+
+      console.log('✅ Gasto salvo no Supabase:', gastoData)
 
       // Cria parcelas futuras apenas para gastos parcelados
       if (isParcelado && gastoData && gastoData[0]) {
@@ -263,6 +281,17 @@ export default function RegistroGastoPage() {
           <div>
             <label className="block text-base font-bold mb-2 text-text-primary">Data do Gasto</label>
             <DatePicker value={dataGasto} onChange={setDataGasto} disabled={loading} />
+          </div>
+
+          {/* ── Data de Vencimento ── */}
+          <div>
+            <label className="block text-base font-bold mb-2 text-text-primary">📅 Data de Vencimento (opcional)</label>
+            <DatePicker value={dataVencimento} onChange={setDataVencimento} disabled={loading} />
+            {dataVencimento && (
+              <p className="text-sm text-text-muted mt-2">
+                ⏰ Status automático: Pendente em menos de 3 dias
+              </p>
+            )}
           </div>
 
           {/* ── Cartão ── */}
@@ -464,6 +493,13 @@ export default function RegistroGastoPage() {
           {/* ── Status ── */}
           <div>
             <label className="block text-base font-bold mb-3 text-text-primary">Status</label>
+            {dataVencimento && (
+              <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                <p className="text-sm text-blue-800 font-medium">
+                  ✓ Status será automático baseado na data de vencimento
+                </p>
+              </div>
+            )}
             <div className="space-y-2">
               {([
                 { value: 'quitado',  label: 'Quitado',  icon: '✅', desc: 'Pagamento concluído' },
@@ -472,12 +508,16 @@ export default function RegistroGastoPage() {
               ] as const).map(({ value, label, icon, desc }) => (
                 <label
                   key={value}
-                  className={`flex items-center p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                    status === value
-                      ? value === 'urgente'
-                        ? 'border-red-400 bg-red-50'
-                        : 'border-wagner bg-wagner/10'
-                      : 'border-border-light hover:border-wagner'
+                  className={`flex items-center p-3 rounded-xl border-2 transition-all ${
+                    dataVencimento
+                      ? 'cursor-not-allowed opacity-50 border-border-light bg-slate-50'
+                      : `cursor-pointer ${
+                          status === value
+                            ? value === 'urgente'
+                              ? 'border-red-400 bg-red-50'
+                              : 'border-wagner bg-wagner/10'
+                            : 'border-border-light hover:border-wagner'
+                        }`
                   }`}
                 >
                   <input
@@ -487,7 +527,7 @@ export default function RegistroGastoPage() {
                     checked={status === value}
                     onChange={() => setStatus(value)}
                     className="w-5 h-5"
-                    disabled={loading}
+                    disabled={loading || !!dataVencimento}
                   />
                   <span className="text-xl ml-3">{icon}</span>
                   <span className="ml-2 flex-1">
